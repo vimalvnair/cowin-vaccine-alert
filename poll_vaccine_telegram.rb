@@ -67,11 +67,10 @@ loop do
       previous_key = current_key
     else
       send_telegram_message("Error, response code: #{resp.code}", "")
-      next
     end
   rescue Exception => e
     send_telegram_message e.message, ""
+  ensure
+    sleep 20
   end
-
-  sleep 20
 end
