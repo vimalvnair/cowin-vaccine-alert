@@ -1,9 +1,11 @@
 require 'net/http'
 require 'json'
 require 'cgi'
+require 'date'
 
 TELEGRAM_BOT_API_KEY = ENV['TELEGRAM_BOT_API_KEY']
 TELEGRAM_CHAT_ID = ENV['TELEGRAM_CHAT_ID']
+TODAY=Date.today.strftime("%d-%m-%Y")
 
 def get_session_details centers
   sessions = centers.map{|c| c['sessions'].map{|s| s.merge(c.select{|k,v| k != "sessions"} || {} )}}.flatten
@@ -11,8 +13,10 @@ def get_session_details centers
   return "" if available_sessions.nil? || available_sessions.empty?
 
   details = available_sessions.map{|s|
-    %(#{s['date']}:#{s['name']}:#{s['address']}:#{s['block_name']}:#{s['pincode']}    
+    %(<u>#{s['date']}</u>
+#{s['name']}, <u>#{s['address']}</u>, #{s['block_name']}, <u>#{s['pincode']}</u>
 Capacity: <b>#{s['available_capacity']}</b>,  Min age: <b>#{s['min_age_limit']}</b>
+<i>-------------------------</i>
 )                              
   }
 end
@@ -34,7 +38,7 @@ current_key = ""
 previous_key = ""
 
 begin
-  uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=303&date=08-05-2021")
+  uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=303&date=#{TODAY}")
   
   req = Net::HTTP::Get.new(uri)
   req['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"
