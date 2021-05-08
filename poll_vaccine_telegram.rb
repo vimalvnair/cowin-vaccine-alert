@@ -8,7 +8,7 @@ TELEGRAM_CHAT_ID = ENV['TELEGRAM_CHAT_ID']
 
 def get_session_details centers
   sessions = centers.map{|c| c['sessions'].map{|s| s.merge(c.select{|k,v| k != "sessions"} || {} )}}.flatten
-  available_sessions =  sessions.select{|s| s['available_capacity'] >= 0}
+  available_sessions =  sessions.select{|s| s['available_capacity'] > 0}
   return "" if available_sessions.nil? || available_sessions.empty?
 
   details = available_sessions.map{|s|
@@ -40,7 +40,7 @@ loop do
   begin
     today = Date.today.strftime("%d-%m-%Y")
     uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=303&date=#{today}")
-    
+    puts "Date: #{today}"
     req = Net::HTTP::Get.new(uri)
     req['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"
 
@@ -48,12 +48,13 @@ loop do
     resp = Net::HTTP.start(uri.hostname, uri.port, use_ssl) {|http|
       http.request(req)
     }
+    puts "http_code: #{resp.code}"
     return send_telegram_message("Error, response code: #{resp.code}", "") if resp.code != "200"
 
     json = JSON.parse(resp.body)
     centers = json['centers']
     sessions = centers.map{|c| c['sessions']}.flatten
-    current_key = sessions.select{|s| s['available_capacity'] >= 0}.map{|s| "#{s['session_id']}#{s['available_capacity']}"}.sort.join
+    current_key = sessions.select{|s| s['available_capacity'] > 0}.map{|s| "#{s['session_id']}#{s['available_capacity']}"}.sort.join
 
     puts current_key
 
