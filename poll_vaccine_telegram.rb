@@ -9,7 +9,7 @@ TELEGRAM_CHAT_ID = ENV['TELEGRAM_CHAT_ID']
 def get_session_details centers
   sessions = centers.map{|c| c['sessions'].map{|s| s.merge(c.select{|k,v| k != "sessions"} || {} )}}.flatten
   available_sessions =  sessions.select{|s| s['available_capacity'] > 0}
-  return "" if available_sessions.nil? || available_sessions.empty?
+  return ["no sessions"] if available_sessions.nil? || available_sessions.empty?
 
   details = available_sessions.map{|s|
     %(<u>#{s['date']}</u>
