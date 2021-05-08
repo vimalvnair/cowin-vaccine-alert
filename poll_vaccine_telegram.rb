@@ -36,7 +36,7 @@ end
 current_key = ""
 previous_key = ""
 
-loop do  
+loop do
   begin
     today = Date.today.strftime("%d-%m-%Y")
     uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=303&date=#{today}")
@@ -49,22 +49,26 @@ loop do
       http.request(req)
     }
     puts "http_code: #{resp.code}"
-    return send_telegram_message("Error, response code: #{resp.code}", "") if resp.code != "200"
 
-    json = JSON.parse(resp.body)
-    centers = json['centers']
-    sessions = centers.map{|c| c['sessions']}.flatten
-    current_key = sessions.select{|s| s['available_capacity'] > 0}.map{|s| "#{s['session_id']}#{s['available_capacity']}"}.sort.join
+    if resp.code == "200"
+      json = JSON.parse(resp.body)
+      centers = json['centers']
+      sessions = centers.map{|c| c['sessions']}.flatten
+      current_key = sessions.select{|s| s['available_capacity'] > 0}.map{|s| "#{s['session_id']}#{s['available_capacity']}"}.sort.join
 
-    puts current_key
+      puts current_key
 
-    if current_key != previous_key
-      session_details = get_session_details centers
-      
-      send_telegram_message session_details.join("\n")
+      if current_key != previous_key
+        session_details = get_session_details centers
+
+        send_telegram_message session_details.join("\n")
+      end
+
+      previous_key = current_key
+    else
+      send_telegram_message("Error, response code: #{resp.code}", "")
+      next
     end
-
-    previous_key = current_key
   rescue Exception => e
     send_telegram_message e.message, ""
   end
