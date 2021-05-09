@@ -70,7 +70,7 @@ loop do
       send_telegram_message("Error, response code: #{resp.code}", "")
     end
   rescue Exception => e
-    send_telegram_message e.message, ""
+    send_telegram_message e.message, "" rescue nil
   ensure
     sleep 20
   end
