@@ -7,5 +7,5 @@ To get notified set `TELEGRAM_BOT_API_KEY` and `TELEGRAM_CHAT_ID` env and run th
 How to create a Telegram bot? https://core.telegram.org/bots#6-botfather
 
 ```
-TELEGRAM_BOT_API_KEY=<bot-api-key> TELEGRAM_CHAT_ID=<chat-id> ruby poll_vaccine_telegram.rb
+TELEGRAM_BOT_API_KEY=<bot-api-key> TELEGRAM_CHAT_ID=<chat-id> TELEGRAM_ERROR_CHANNEL_CHAT_ID=<error-channel-chat-id> ruby poll_vaccine_telegram.rb
 ```
