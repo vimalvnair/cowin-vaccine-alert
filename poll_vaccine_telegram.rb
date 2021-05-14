@@ -5,25 +5,28 @@ require 'date'
 
 TELEGRAM_BOT_API_KEY = ENV['TELEGRAM_BOT_API_KEY']
 TELEGRAM_CHAT_ID = ENV['TELEGRAM_CHAT_ID']
+TELEGRAM_ERROR_CHANNEL_CHAT_ID = ENV['TELEGRAM_ERROR_CHANNEL_CHAT_ID']
 DISTRICT_ID = 303
 
 def get_session_details centers
   sessions = centers.map{|c| c['sessions'].map{|s| s.merge(c.select{|k,v| k != "sessions"} || {} )}}.flatten
   available_sessions =  sessions.select{|s| s['available_capacity'] > 0}
   return ["no sessions"] if available_sessions.nil? || available_sessions.empty?
-
+  puts available_sessions.count
   details = available_sessions.map{|s|
     %(<u>#{s['date']}</u>
-#{s['name']}, <u>#{s['address']}</u>, #{s['block_name']}, <u>#{s['pincode']}</u>
-Capacity: <b>#{s['available_capacity']}</b>,  Min age: <b>#{s['min_age_limit']}</b>
+#{s['name']}, <u>#{s['address']}</u>, #{s['block_name']}, <b><u>#{s['pincode']}</u></b>
+Vaccine: <b>#{s['vaccine']}</b>
+Minimum age: <b>#{s['min_age_limit']}</b>
+Capacity: <b>#{s['available_capacity']}</b>
 <i>-------------------------</i>
 )                              
   }
 end
 
-def send_telegram_message message, parse_mode = 'html'
+def send_telegram_message message, chat_id, parse_mode = 'html'
   puts message
-  uri = URI("https://api.telegram.org/bot#{TELEGRAM_BOT_API_KEY}/sendMessage?chat_id=#{TELEGRAM_CHAT_ID}&parse_mode=#{parse_mode}&text=#{CGI.escape(message)}")
+  uri = URI("https://api.telegram.org/bot#{TELEGRAM_BOT_API_KEY}/sendMessage?chat_id=#{chat_id}&parse_mode=#{parse_mode}&text=#{CGI.escape(message)}")
   req = Net::HTTP::Get.new(uri)
   res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
     http.request(req)
@@ -61,17 +64,19 @@ loop do
 
       if current_key != previous_key
         session_details = get_session_details centers
-
-        send_telegram_message session_details.join("\n")
+        session_details.each_slice(12).each do |session_slice|
+          send_telegram_message session_slice.join("\n"), TELEGRAM_CHAT_ID
+          sleep 2
+        end
       end
 
       previous_key = current_key
     else
-      send_telegram_message("Error, response code: #{resp.code}", "")
+      send_telegram_message("Error, response code: #{resp.code}", TELEGRAM_ERROR_CHANNEL_CHAT_ID, "")
     end
   rescue Exception => e
-    send_telegram_message e.message, "" rescue nil
+    send_telegram_message e.message, TELEGRAM_ERROR_CHANNEL_CHAT_ID, "" rescue nil
   ensure
-    sleep 20
+    sleep 15
   end
 end
