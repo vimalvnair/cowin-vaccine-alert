@@ -6,7 +6,7 @@ require 'date'
 TELEGRAM_BOT_API_KEY = ENV['TELEGRAM_BOT_API_KEY']
 TELEGRAM_CHAT_ID = ENV['TELEGRAM_CHAT_ID']
 TELEGRAM_ERROR_CHANNEL_CHAT_ID = ENV['TELEGRAM_ERROR_CHANNEL_CHAT_ID']
-DISTRICT_ID = 303
+DISTRICT_ID = ENV['DISTRICT_ID']
 
 def get_session_details centers
   sessions = centers.map{|c| c['sessions'].map{|s| s.merge(c.select{|k,v| k != "sessions"} || {} )}}.flatten
@@ -14,10 +14,9 @@ def get_session_details centers
   return ["no sessions"] if available_sessions.nil? || available_sessions.empty?
   puts available_sessions.count
   details = available_sessions.map{|s|
-    %(<u>#{s['date']}</u>
+    %(<u>#{s['date']}</u> Age: <b>#{s['min_age_limit']}+</b>
 #{s['name']}, <u>#{s['address']}</u>, #{s['block_name']}, <b><u>#{s['pincode']}</u></b>
 Vaccine: <b>#{s['vaccine']}</b>
-Minimum age: <b>#{s['min_age_limit']}</b>
 Capacity: <b>#{s['available_capacity']}</b>
 <i>-------------------------</i>
 )                              
@@ -64,7 +63,7 @@ loop do
 
       if current_key != previous_key
         session_details = get_session_details centers
-        session_details.each_slice(12).each do |session_slice|
+        session_details.each_slice(18).each do |session_slice|
           send_telegram_message session_slice.join("\n"), TELEGRAM_CHAT_ID
           sleep 2
         end
