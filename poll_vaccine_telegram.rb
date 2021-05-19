@@ -44,7 +44,7 @@ previous_key = ""
 loop do
   begin
     today = Date.today.strftime("%d-%m-%Y")
-    uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id=#{DISTRICT_ID}&date=#{today}")
+    uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=#{DISTRICT_ID}&date=#{today}")
     puts "Date: #{today}"
     req = Net::HTTP::Get.new(uri)
     req['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"
