@@ -17,7 +17,9 @@ def get_session_details centers
     %(<u>#{s['date']}</u> Age: <b>#{s['min_age_limit']}+</b>
 #{s['name']}, <u>#{s['address']}</u>, #{s['block_name']}, <b><u>#{s['pincode']}</u></b>
 Vaccine: <b>#{s['vaccine']}</b>
-Capacity: <b>#{s['available_capacity']}</b>
+Total Capacity: <b>#{s['available_capacity']}</b>
+Dose 1 Capacity: <b>#{s['available_capacity_dose1']}</b>
+Dose 2 Capacity: <b>#{s['available_capacity_dose2']}</b>
 <i>-------------------------</i>
 )                              
   }
@@ -42,7 +44,7 @@ previous_key = ""
 loop do
   begin
     today = Date.today.strftime("%d-%m-%Y")
-    uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=#{DISTRICT_ID}&date=#{today}")
+    uri = URI("https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id=#{DISTRICT_ID}&date=#{today}")
     puts "Date: #{today}"
     req = Net::HTTP::Get.new(uri)
     req['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36"
@@ -63,7 +65,7 @@ loop do
 
       if current_key != previous_key
         session_details = get_session_details centers
-        session_details.each_slice(18).each do |session_slice|
+        session_details.each_slice(17).each do |session_slice|
           send_telegram_message session_slice.join("\n"), TELEGRAM_CHAT_ID
           sleep 2
         end
