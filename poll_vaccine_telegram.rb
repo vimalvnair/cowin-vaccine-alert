@@ -17,6 +17,7 @@ def get_session_details centers
     %(<u>#{s['date']}</u> Age: <b>#{s['min_age_limit']}+</b>
 #{s['name']}, <u>#{s['address']}</u>, #{s['block_name']}, <b><u>#{s['pincode']}</u></b>
 Vaccine: <b>#{s['vaccine']}</b>
+Age: <b>#{s['min_age_limit']}+</b>
 Dose 1 Capacity: <b>#{s['available_capacity_dose1']}</b>
 Dose 2 Capacity: <b>#{s['available_capacity_dose2']}</b>
 Total Capacity: <b>#{s['available_capacity']}</b>
