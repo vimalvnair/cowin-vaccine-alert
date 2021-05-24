@@ -79,6 +79,6 @@ loop do
   rescue Exception => e
     send_telegram_message e.message, TELEGRAM_ERROR_CHANNEL_CHAT_ID, "" rescue nil
   ensure
-    sleep 15
+    sleep 25
   end
 end
