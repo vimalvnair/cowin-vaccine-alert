@@ -10,7 +10,7 @@ DISTRICT_ID = ENV['DISTRICT_ID']
 MIN_AGE_LIMIT = ENV['MIN_AGE_LIMIT']
 
 def filter_condition session
-  session['available_capacity'] > 0 && (MIN_AGE_LIMIT.nil? || session['min_age_limit'].to_i == MIN_AGE_LIMIT.to_i)
+  session['available_capacity'] > 1 && (MIN_AGE_LIMIT.nil? || session['min_age_limit'].to_i == MIN_AGE_LIMIT.to_i)
 end
 
 def get_session_details centers
